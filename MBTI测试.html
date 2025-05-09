@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBTI性格测试 - 专业版</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --accent-color: #7209b7;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4cc9f0;
+            --warning-color: #f72585;
+            --border-radius: 12px;
+            --box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            line-height: 1.6;
+            color: var(--dark-color);
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeIn 0.8s ease;
+        }
+        
+        h1 {
+            color: var(--secondary-color);
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            color: var(--accent-color);
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+            margin-bottom: 20px;
+            transition: var(--transition);
+            animation: slideUp 0.6s ease;
+        }
+        
+        .intro-card {
+            text-align: center;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .question-card {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .question-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary-color), var(--accent-color));
+        }
+        
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+            color: var(--dark-color);
+        }
+        
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background-color: var(--light-color);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+        
+        .option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .option.selected {
+            background-color: rgba(67, 97, 238, 0.1);
+            border-color: var(--primary-color);
+        }
+        
+        .option-radio {
+            margin-right: 15px;
+            min-width: 18px;
+            min-height: 18px;
+            accent-color: var(--primary-color);
+        }
+        
+        .progress-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 20px;
+            margin: 25px 0;
+            height: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+            border-radius: 20px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+        
+        .progress-text {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--dark-color);
+            opacity: 0.7;
+            margin-bottom: 5px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(67, 97, 238, 0.4);
+        }
+        
+        .btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .result-card {
+            display: none;
+            text-align: center;
+            animation: fadeIn 0.8s ease;
+        }
+        
+        .result-type {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 20px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .result-description {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--dark-color);
+            margin-bottom: 20px;
+        }
+        
+        .result-details {
+            text-align: left;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .dimension-score {
+            margin-bottom: 15px;
+        }
+        
+        .dimension-name {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .score-bar {
+            height: 8px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .score-progress {
+            height: 100%;
+            background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+            border-radius: 4px;
+        }
+        
+        .score-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .restart-btn {
+            margin-top: 30px;
+            background: linear-gradient(to right, var(--warning-color), #b5179e);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .question-text {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>MBTI性格测试</h1>
+            <p class="subtitle">发现真实的自我 · 了解你的性格类型</p>
+        </header>
+        
+        <div class="card intro-card" id="intro-card">
+            <h2>欢迎参加MBTI测试</h2>
+            <p>本测试包含20个问题，将帮助你确定你的MBTI性格类型。请根据你的第一反应选择最符合你的选项。</p>
+            <p>测试完成后，你将获得详细的性格分析报告。</p>
+            <button class="btn" id="start-btn">开始测试</button>
+        </div>
+        
+        <div class="card question-card" id="test-container" style="display: none;">
+            <div class="progress-text" id="progress-text">问题 1/20</div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div class="question-text" id="question-text"></div>
+            <div class="options-container" id="options-container"></div>
+            <button class="btn" id="next-btn" disabled>下一题</button>
+        </div>
+        
+        <div class="card result-card" id="result-card">
+            <h2>你的测试结果</h2>
+            <div class="result-type" id="result-type"></div>
+            <div class="result-description" id="result-description"></div>
+            
+            <div class="result-details">
+                <h3>维度分析</h3>
+                <div id="dimension-scores"></div>
+            </div>
+            
+            <button class="btn restart-btn" id="restart-btn">重新测试</button>
+        </div>
+    </div>
+    
+    <script>
+        // MBTI测试问题
+        const questions = [
+            {
+                question: "在聚会中，你通常：",
+                dimension: "EI",
+                options: [
+                    {text: "与很多人交流，包括陌生人", score: "E"},
+                    {text: "只与少数熟悉的人交流", score: "I"}
+                ]
+            },
+            {
+                question: "你更倾向于：",
+                dimension: "SN",
+                options: [
+                    {text: "关注事实和细节", score: "S"},
+                    {text: "关注可能性和整体概念", score: "N"}
+                ]
+            },
+            {
+                question: "做决定时，你更注重：",
+                dimension: "TF",
+                options: [
+                    {text: "逻辑和客观分析", score: "T"},
+                    {text: "价值观和人际关系", score: "F"}
+                ]
+            },
+            {
+                question: "你更喜欢的生活方式是：",
+                dimension: "JP",
+                options: [
+                    {text: "有计划、有组织的", score: "J"},
+                    {text: "灵活、随性的", score: "P"}
+                ]
+            },
+            {
+                question: "当你学习新东西时，你更喜欢：",
+                dimension: "SN",
+                options: [
+                    {text: "按部就班地学习", score: "S"},
+                    {text: "先了解整体框架再学习细节", score: "N"}
+                ]
+            },
+            {
+                question: "在团队中，你通常：",
+                dimension: "EI",
+                options: [
+                    {text: "积极参与讨论", score: "E"},
+                    {text: "先倾听再发言", score: "I"}
+                ]
+            },
+            {
+                question: "当朋友遇到问题时，你更可能：",
+                dimension: "TF",
+                options: [
+                    {text: "分析问题并提供解决方案", score: "T"},
+                    {text: "提供情感支持", score: "F"}
+                ]
+            },
+            {
+                question: "你更倾向于：",
+                dimension: "JP",
+                options: [
+                    {text: "提前计划好行程", score: "J"},
+                    {text: "根据情况灵活调整", score: "P"}
+                ]
+            },
+            {
+                question: "你更相信：",
+                dimension: "SN",
+                options: [
+                    {text: "实际经验和具体事实", score: "S"},
+                    {text: "直觉和灵感", score: "N"}
+                ]
+            },
+            {
+                question: "在社交场合，你通常：",
+                dimension: "EI",
+                options: [
+                    {text: "主动认识新朋友", score: "E"},
+                    {text: "等待别人来认识你", score: "I"}
+                ]
+            },
+            {
+                question: "评价一个决定时，你更看重：",
+                dimension: "TF",
+                options: [
+                    {text: "这个决定是否合理", score: "T"},
+                    {text: "这个决定对人们的影响", score: "F"}
+                ]
+            },
+            {
+                question: "你更喜欢的工作方式是：",
+                dimension: "JP",
+                options: [
+                    {text: "按计划完成任务", score: "J"},
+                    {text: "根据灵感自由发挥", score: "P"}
+                ]
+            },
+            {
+                question: "你更倾向于：",
+                dimension: "SN",
+                options: [
+                    {text: "关注现实和当下", score: "S"},
+                    {text: "想象未来的可能性", score: "N"}
+                ]
+            },
+            {
+                question: "当你需要充电时，你更喜欢：",
+                dimension: "EI",
+                options: [
+                    {text: "与朋友在一起", score: "E"},
+                    {text: "独自一人", score: "I"}
+                ]
+            },
+            {
+                question: "当批评别人时，你更注重：",
+                dimension: "TF",
+                options: [
+                    {text: "批评是否公正准确", score: "T"},
+                    {text: "批评的方式是否温和", score: "F"}
+                ]
+            },
+            {
+                question: "你更倾向于：",
+                dimension: "JP",
+                options: [
+                    {text: "做出决定后不再改变", score: "J"},
+                    {text: "保留改变主意的可能性", score: "P"}
+                ]
+            },
+            {
+                question: "你更相信：",
+                dimension: "SN",
+                options: [
+                    {text: "实际经验", score: "S"},
+                    {text: "直觉感受", score: "N"}
+                ]
+            },
+            {
+                question: "周末你更喜欢：",
+                dimension: "EI",
+                options: [
+                    {text: "安排活动与人见面", score: "E"},
+                    {text: "有独处的时间", score: "I"}
+                ]
+            },
+            {
+                question: "你更看重：",
+                dimension: "TF",
+                options: [
+                    {text: "真理和公正", score: "T"},
+                    {text: "和谐与善意", score: "F"}
+                ]
+            },
+            {
+                question: "你更倾向于：",
+                dimension: "JP",
+                options: [
+                    {text: "把事情确定下来", score: "J"},
+                    {text: "保持选择的开放性", score: "P"}
+                ]
+            }
+        ];
+
+        // MBTI类型描述
+        const typeDescriptions = {
+            "ISTJ": "务实、实事求是，做事专注且有逻辑性。喜欢有秩序和组织，重视传统和忠诚。ISTJ型的人安静、严肃，通过全面性和可靠性获得成功。他们负责，将工作、家庭和生活都安排得井井有条。",
+            "ISFJ": "安静、友好、负责且尽责。致力于为他人服务，关注他人的感受。ISFJ型的人忠诚、有奉献精神和同情心，乐于帮助他人。他们实际、有条理，能够记住对他们重要的细节。",
+            "INFJ": "寻求意义和联系，有强烈的价值观。富有洞察力，致力于实现愿景。INFJ型的人具有强烈的直觉和洞察力，关心他人的想法和感受。他们通常有清晰的愿景，知道如何最好地为公共利益服务。",
+            "INTJ": "有原创思想和强大动力去实现自己的想法和目标。快速发现模式并理解复杂概念。INTJ型的人具有创造性的思维和强大的动力来实现自己的想法和目标。他们能够快速看到模式和可能性，常常对理论和抽象思维感兴趣。",
+            "ISTP": "灵活且宽容，冷静观察者。当问题出现时迅速行动找到解决方案。ISTP型的人冷静、灵活，擅长分析问题并找到解决方案。他们对原因和结果感兴趣，擅长使用逻辑处理技术问题。",
+            "ISFP": "安静、友好、敏感且善良。享受当下，不喜欢争论和冲突。ISFP型的人谦虚、安静，喜欢有自己的空间和灵活的时间。他们忠于自己的价值观和重要的人，不喜欢争论和冲突。",
+            "INFP": "理想主义者，忠于自己的价值观和重要的人。好奇并寻求理解他人。INFP型的人理想主义，忠于自己的价值观和重要的人。他们希望外部生活与自己的价值观一致，好奇并寻求理解他人。",
+            "INTP": "寻求发展对一切事物的逻辑解释。理论性和抽象性，更关注想法而非社交互动。INTP型的人逻辑性强、有独创性，喜欢理论和抽象思维。他们安静、灵活，对想法比对社交互动更感兴趣。",
+            "ESTP": "灵活且宽容，注重实际结果。使事情活跃起来，并迅速采取行动解决问题。ESTP型的人灵活、宽容，注重实际结果。他们喜欢行动和解决问题，擅长即时应对和说服他人。",
+            "ESFP": "外向、友好且包容。热爱生活、人和物质享受。使工作变得有趣。ESFP型的人外向、友好，接受他人。他们热爱生活、人和物质享受，喜欢使工作变得有趣。",
+            "ENFP": "热情且富有想象力。视生活充满可能性。快速建立联系并依赖模式。ENFP型的人热情、富有创造力，能够将生活视为充满可能性。他们擅长建立联系，依赖模式和洞察力。",
+            "ENTP": "聪明、好奇、思想敏捷。善于解决新问题和挑战。善于辩论。ENTP型的人聪明、好奇，思想敏捷。他们擅长解决新问题和挑战，喜欢辩论和智力挑战。",
+            "ESTJ": "务实、现实、果断。快速采取行动实施决策。组织和运行活动。ESTJ型的人实际、现实，果断且迅速采取行动实施决策。他们擅长组织和运行活动，喜欢清晰的逻辑。",
+            "ESFJ": "热心、合作、注重和谐。喜欢与他人一起准确及时地完成任务。ESFJ型的人热心、合作，注重和谐。他们喜欢与他人一起准确及时地完成任务，忠诚且善于合作。",
+            "ENFJ": "热情、善解人意、有责任心。善于发现他人的潜能并帮助他人成长。ENFJ型的人热情、善解人意，有责任心。他们善于发现他人的潜能并帮助他人成长，善于促进和谐。",
+            "ENTJ": "坦率、果断，乐于承担领导责任。快速发现不合逻辑和低效的程序。ENTJ型的人坦率、果断，乐于承担领导责任。他们能够快速发现不合逻辑和低效的程序，擅长制定和实施全面的系统。"
+        };
+
+        // 维度解释
+        const dimensionExplanations = {
+            "EI": {
+                name: "外向(E) vs 内向(I)",
+                description: "表示你获取能量的方式，外向者从社交中获取能量，内向者从独处中恢复能量。"
+            },
+            "SN": {
+                name: "实感(S) vs 直觉(N)",
+                description: "表示你获取信息的方式，实感型关注具体事实，直觉型关注整体模式和可能性。"
+            },
+            "TF": {
+                name: "思考(T) vs 情感(F)",
+                description: "表示你做决策的方式，思考型注重逻辑分析，情感型注重价值观和人际关系。"
+            },
+            "JP": {
+                name: "判断(J) vs 感知(P)",
+                description: "表示你对待生活的方式，判断型喜欢计划和组织，感知型喜欢灵活和自发。"
+            }
+        };
+
+        // 当前问题索引
+        let currentQuestionIndex = 0;
+        // 用户答案
+        const answers = {
+            E: 0, I: 0,
+            S: 0, N: 0,
+            T: 0, F: 0,
+            J: 0, P: 0
+        };
+        // 用户选择的选项
+        const userSelections = new Array(questions.length).fill(null);
+
+        // DOM元素
+        const introCard = document.getElementById('intro-card');
+        const testContainer = document.getElementById('test-container');
+        const resultCard = document.getElementById('result-card');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const nextBtn = document.getElementById('next-btn');
+        const progressText = document.getElementById('progress-text');
+        const progressBar = document.getElementById('progress-bar');
+        const startBtn = document.getElementById('start-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const resultType = document.getElementById('result-type');
+        const resultDescription = document.getElementById('result-description');
+        const dimensionScores = document.getElementById('dimension-scores');
+
+        // 初始化测试
+        function initTest() {
+            startBtn.addEventListener('click', startTest);
+            nextBtn.addEventListener('click', nextQuestion);
+            restartBtn.addEventListener('click', restartTest);
+        }
+
+        // 开始测试
+        function startTest() {
+            introCard.style.display = 'none';
+            testContainer.style.display = 'block';
+            showQuestion();
+        }
+
+        // 显示当前问题
+        function showQuestion() {
+            const question = questions[currentQuestionIndex];
+            
+            // 更新进度
+            updateProgress();
+            
+            // 设置问题文本
+            questionText.textContent = question.question;
+            
+            // 清空选项容器
+            optionsContainer.innerHTML = '';
+            
+            // 添加选项
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = `option ${userSelections[currentQuestionIndex] === index ? 'selected' : ''}`;
+                optionElement.innerHTML = `
+                    <input type="radio" id="option-${index}" name="question-${currentQuestionIndex}" 
+                           value="${option.score}" class="option-radio" ${userSelections[currentQuestionIndex] === index ? 'checked' : ''}>
+                    <label for="option-${index}">${option.text}</label>
+                `;
+                
+                // 添加点击事件
+                optionElement.addEventListener('click', () => selectOption(index, option.score));
+                
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            // 更新下一题按钮状态
+            nextBtn.disabled = userSelections[currentQuestionIndex] === null;
+        }
+
+        // 选择选项
+        function selectOption(optionIndex, score) {
+            // 更新用户选择
+            userSelections[currentQuestionIndex] = optionIndex;
+            
+            // 更新选项样式
+            const options = document.querySelectorAll('.option');
+            options.forEach((option, index) => {
+                if (index === optionIndex) {
+                    option.classList.add('selected');
+                } else {
+                    option.classList.remove('selected');
+                }
+            });
+            
+            // 启用下一题按钮
+            nextBtn.disabled = false;
+        }
+
+        // 更新进度
+        function updateProgress() {
+            const progress = ((currentQuestionIndex) / questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+            progressText.textContent = `问题 ${currentQuestionIndex + 1}/${questions.length}`;
+        }
+
+        // 下一题
+        function nextQuestion() {
+            // 记录答案
+            const selectedOptionIndex = userSelections[currentQuestionIndex];
+            if (selectedOptionIndex !== null) {
+                const selectedScore = questions[currentQuestionIndex].options[selectedOptionIndex].score;
+                answers[selectedScore]++;
+            }
+            
+            // 如果是最后一题，显示结果
+            if (currentQuestionIndex === questions.length - 1) {
+                showResult();
+                return;
+            }
+            
+            // 否则，显示下一题
+            currentQuestionIndex++;
+            showQuestion();
+        }
+
+        // 显示结果
+        function showResult() {
+            testContainer.style.display = 'none';
+            resultCard.style.display = 'block';
+            
+            // 计算MBTI类型
+            const mbtiType = calculateMBTIType();
+            resultType.textContent = mbtiType;
+            resultDescription.textContent = typeDescriptions[mbtiType] || "暂无此类型的详细描述。";
+            
+            // 显示维度分析
+            showDimensionAnalysis(mbtiType);
+            
+            // 滚动到顶部
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 计算MBTI类型
+        function calculateMBTIType() {
+            let mbti = '';
+            
+            // E/I维度
+            mbti += answers.E > answers.I ? 'E' : 'I';
+            // S/N维度
+            mbti += answers.S > answers.N ? 'S' : 'N';
+            // T/F维度
+            mbti += answers.T > answers.F ? 'T' : 'F';
+            // J/P维度
+            mbti += answers.J > answers.P ? 'J' : 'P';
+            
+            return mbti;
+        }
+
+        // 显示维度分析
+        function showDimensionAnalysis(mbtiType) {
+            dimensionScores.innerHTML = '';
+            
+            // 计算每个维度的百分比
+            const dimensions = [
+                { code: 'EI', left: 'E', right: 'I', leftScore: answers.E, rightScore: answers.I },
+                { code: 'SN', left: 'S', right: 'N', leftScore: answers.S, rightScore: answers.N },
+                { code: 'TF', left: 'T', right: 'F', leftScore: answers.T, rightScore: answers.F },
+                { code: 'JP', left: 'J', right: 'P', leftScore: answers.J, rightScore: answers.P }
+            ];
+            
+            dimensions.forEach(dim => {
+                const total = dim.leftScore + dim.rightScore;
+                const leftPercent = total > 0 ? Math.round((dim.leftScore / total) * 100) : 50;
+                const rightPercent = 100 - leftPercent;
+                
+                const dimensionElement = document.createElement('div');
+                dimensionElement.className = 'dimension-score';
+                dimensionElement.innerHTML = `
+                    <div class="dimension-name">${dimensionExplanations[dim.code].name}</div>
+                    <p style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">${dimensionExplanations[dim.code].description}</p>
+                    <div class="score-bar">
+                        <div class="score-progress" style="width: ${leftPercent}%"></div>
+                    </div>
+                    <div class="score-labels">
+                        <span>${dim.left} ${leftPercent}%</span>
+                        <span>${dim.right} ${rightPercent}%</span>
+                    </div>
+                `;
+                
+                dimensionScores.appendChild(dimensionElement);
+            });
+        }
+
+        // 重新测试
+        function restartTest() {
+            // 重置所有数据
+            currentQuestionIndex = 0;
+            Object.keys(answers).forEach(key => answers[key] = 0);
+            userSelections.fill(null);
+            
+            // 显示介绍卡片
+            resultCard.style.display = 'none';
+            introCard.style.display = 'block';
+            
+            // 滚动到顶部
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 初始化
+        window.onload = initTest;
+    </script>
+</body>
+</html>
